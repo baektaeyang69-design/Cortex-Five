@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f4ed">
+  <title>Parts of the Human Brain</title>
+  <style>
+    :root {
+      --bg: #f7f4ed;
+      --paper: #fffefa;
+      --ink: #222729;
+      --muted: #626b6b;
+      --green: #3f6659;
+      --green-light: #e9f0ed;
+      --line: #e2ddd1;
+      --shadow: 0 8px 26px rgba(45, 40, 30, 0.08);
+      --font-main: 'Calibri', 'Carlito', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: var(--font-main);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 32px 24px 16px;
+    }
+
+    .kicker {
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    h1 {
+      font-family: var(--font-main);
+      font-size: clamp(2.1rem, 4.5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 8px 0 10px;
+      line-height: 1.12;
+    }
+
+    header p {
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 680px;
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    main {
+      max-width: 1160px;
+      margin: 14px auto 44px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .panel h2 {
+      font-size: 1.12rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .hint {
+      font-size: 0.94rem;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+
+    .diagram-wrap {
+      background: #ffffff;
+      border: 1px solid #ede8dd;
+      border-radius: 12px;
+      padding: 10px 6px 14px;
+      margin-top: 6px;
+    }
+
+    svg#brainDiagram {
+      width: 100%;
+      height: auto;
+      display: block;
+      user-select: none;
+    }
+
+    /* Interactive brain region styling */
+    .brain-region {
+      cursor: pointer;
+      transition: filter 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .brain-region:hover {
+      filter: brightness(1.06) contrast(1.03);
+    }
+
+    .brain-region:focus {
+      outline: none;
+    }
+
+    .brain-region:focus-visible .lobe-outline,
+    .brain-region.active .lobe-outline {
+      stroke: #1c2422;
+      stroke-width: 3.4;
+      filter: drop-shadow(0 0 6px rgba(28, 36, 34, 0.35));
+    }
+
+    .brain-region.dimmed {
+      opacity: 0.72;
+    }
+
+    /* Leader lines & labels matching reference illustration */
+    .leader-line {
+      stroke: #181a1b;
+      stroke-width: 2.1;
+      stroke-linecap: round;
+      fill: none;
+      transition: stroke 0.2s ease, stroke-width 0.2s ease;
+    }
+
+    .leader-label {
+      font-family: var(--font-main);
+      font-size: 17.5px;
+      font-weight: 500;
+      fill: #181a1b;
+      cursor: pointer;
+      transition: font-weight 0.15s ease, fill 0.15s ease;
+    }
+
+    .leader-label:hover,
+    .leader-label.active {
+      font-weight: 700;
+      fill: var(--green);
+    }
+
+    /* Quick select pills */
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .part-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #f5f1e8;
+      border: 1px solid #dcd5c7;
+      border-radius: 8px;
+      padding: 9px 13px;
+      font-family: var(--font-main);
+      font-size: 0.94rem;
+      font-weight: 600;
+      color: #2c3331;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .part-btn:hover {
+      background: #ece6d9;
+      border-color: #c7beae;
+    }
+
+    .part-btn.active {
+      background: var(--green);
+      color: #ffffff;
+      border-color: var(--green);
+      box-shadow: 0 3px 10px rgba(63, 102, 89, 0.24);
+    }
+
+    .part-btn:focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 2px;
+    }
+
+    .swatch {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, 0.22);
+      flex-shrink: 0;
+    }
+
+    /* Right side details panel */
+    .details {
+      display: flex;
+      flex-direction: column;
+      min-height: 460px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .details .eyebrow {
+      color: var(--green);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    #partName {
+      font-family: var(--font-main);
+      font-size: 2.15rem;
+      font-weight: 700;
+      margin: 10px 0 14px;
+      line-height: 1.15;
+    }
+
+    .details h3 {
+      font-size: 0.85rem;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin: 18px 0 6px;
+    }
+
+    .details p {
+      font-size: 1.02rem;
+      line-height: 1.65;
+      color: #454f4d;
+      margin: 0;
+    }
+
+    .note {
+      margin-top: auto;
+      padding-top: 24px;
+      border-top: 1px solid #eee9de;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #7d8681;
+    }
+
+    @media (max-width: 860px) {
+      main {
+        grid-template-columns: 1fr;
+        padding: 0 16px;
+      }
+      .details {
+        position: static;
+        min-height: auto;
+      }
+      header {
+        padding: 24px 16px 12px;
+      }
+      .panel {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .leader-label {
+        font-size: 15px;
+      }
+      .part-btn {
+        flex: 1 1 calc(50% - 8px);
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="kicker">Interactive Neuroanatomy Guide</div>
+    <h1>Parts of the Human Brain</h1>
+    <p>Select any sculpted region of the brain or use the buttons below to inspect its anatomical definition and primary functions.</p>
+  </header>
+
+  <main>
+    <!-- Interactive Brain Illustration Card -->
+    <section class="panel" aria-label="Brain Diagram Explorer">
+      <div class="panel-header">
+        <h2>Explore the brain</h2>
+      </div>
+      <p class="hint">Click or tap on a colored lobe, the cerebellum, or the spinal cord.</p>
+
+      <div class="diagram-wrap">
+        <svg id="brainDiagram" viewBox="0 0 800 500" role="group" aria-label="Sculpted lateral illustration of the human brain">
+          <defs>
+            <!-- Drop shadow beneath entire brain -->
+            <filter id="brainDropShadow" x="-10%" y="-10%" width="125%" height="130%">
+              <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#1f1a18" flood-opacity="0.16"/>
+            </filter>
+
+            <!-- FRONTAL LOBE: Rich Crimson & Glossy Red -->
+            <radialGradient id="frontalGrad" cx="35%" cy="32%" r="72%">
+              <stop offset="0%" stop-color="#ff6961"/>
+              <stop offset="32%" stop-color="#eb2629"/>
+              <stop offset="72%" stop-color="#c4121b"/>
+              <stop offset="100%" stop-color="#7c070f"/>
+            </radialGradient>
+            <linearGradient id="frontalPrecentral" x1="0" y1="0" x2="1" y2="0.8">
+              <stop offset="0%" stop-color="#ff4d4d"/>
+              <stop offset="48%" stop-color="#dc1d22"/>
+              <stop offset="100%" stop-color="#8a0911"/>
+            </linearGradient>
+
+            <!-- PARIETAL LOBE: Bright Golden Yellow -->
+            <radialGradient id="parietalGrad" cx="45%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#fff99e"/>
+              <stop offset="35%" stop-color="#ffe135"/>
+              <stop offset="75%" stop-color="#f5b800"/>
+              <stop offset="100%" stop-color="#b87800"/>
+            </radialGradient>
+
+            <!-- OCCIPITAL LOBE: Sky / Ice Blue -->
+            <radialGradient id="occipitalGrad" cx="42%" cy="35%" r="70%">
+              <stop offset="0%" stop-color="#e3f7ff"/>
+              <stop offset="38%" stop-color="#9bd8f5"/>
+              <stop offset="78%" stop-color="#5da9d6"/>
+              <stop offset="100%" stop-color="#2c668f"/>
+            </radialGradient>
+
+            <!-- TEMPORAL LOBE: Vibrant Orchid / Magenta-Purple -->
+            <radialGradient id="temporalGrad" cx="42%" cy="35%" r="72%">
+              <stop offset="0%" stop-color="#f2b8ed"/>
+              <stop offset="38%" stop-color="#c96ec2"/>
+              <stop offset="78%" stop-color="#994294"/>
+              <stop offset="100%" stop-color="#5b1f59"/>
+            </radialGradient>
+
+            <!-- CEREBELLUM: Warm Golden-Brown / Ochre -->
+            <radialGradient id="cerebellumGrad" cx="42%" cy="30%" r="72%">
+              <stop offset="0%" stop-color="#f5c982"/>
+              <stop offset="45%" stop-color="#cc8739"/>
+              <stop offset="85%" stop-color="#965619"/>
+              <stop offset="100%" stop-color="#5e3109"/>
+            </radialGradient>
+
+            <!-- SPINAL CORD / BRAINSTEM: Muted Mauve / Purple-Pink -->
+            <linearGradient id="spinalGrad" x1="0" y1="0" x2="1" y2="0.4">
+              <stop offset="0%" stop-color="#d89bc8"/>
+              <stop offset="45%" stop-color="#a66498"/>
+              <stop offset="85%" stop-color="#753d6a"/>
+              <stop offset="100%" stop-color="#4d2246"/>
+            </linearGradient>
+
+            <!-- Clip paths so internal sulci & specular highlights stay crisp inside each lobe -->
+            <clipPath id="clipFrontal">
+              <path d="M166 266 C152 246 151 224 162 206 C149 188 153 163 169 149 C166 125 182 99 207 90 C219 67 247 54 274 58 C293 43 324 41 346 53 C368 41 399 42 419 52 C416 69 401 81 393 97 C382 119 384 142 372 162 C360 183 361 206 347 224 C324 233 295 244 268 258 C240 272 213 287 188 282 C176 280 170 274 166 266 Z"/>
+            </clipPath>
+
+            <clipPath id="clipParietal">
+              <path d="M419 52 C444 48 471 57 487 74 C514 75 538 93 546 117 C567 128 578 153 571 176 C552 179 535 190 526 206 C512 204 498 212 492 224 C472 225 455 215 446 199 C431 190 411 193 398 205 C382 213 363 219 347 224 C361 206 360 183 372 162 C384 142 382 119 393 97 C401 81 416 69 419 52 Z"/>
+            </clipPath>
+
+            <clipPath id="clipOccipital">
+              <path d="M571 176 C590 185 601 208 594 229 C606 247 604 274 587 289 C588 308 571 324 551 322 C535 327 517 319 509 305 C503 288 506 269 499 253 C491 242 490 232 492 224 C498 212 512 204 526 206 C535 190 552 179 571 176 Z"/>
+            </clipPath>
+
+            <clipPath id="clipTemporal">
+              <path d="M276 312 C281 286 306 268 332 269 C349 247 375 231 401 221 C416 202 440 198 459 211 C475 215 488 221 495 234 C505 251 504 274 509 294 C512 311 499 327 482 329 C463 343 437 346 416 336 C395 352 365 356 341 344 C317 355 288 345 278 322 C276 319 275 315 276 312 Z"/>
+            </clipPath>
+
+            <clipPath id="clipCerebellum">
+              <path d="M412 342 C433 324 467 317 498 323 C528 328 552 345 552 369 C552 395 524 419 485 424 C448 429 415 415 404 391 C397 374 400 354 412 342 Z"/>
+            </clipPath>
+
+            <clipPath id="clipSpinal">
+              <path d="M359 346 C377 351 395 350 407 344 C401 364 401 384 411 401 C422 414 435 422 445 438 L421 444 C411 427 397 413 383 398 C370 383 360 366 359 346 Z"/>
+            </clipPath>
+          </defs>
+
+          <!-- Main Sculpted Brain Group -->
+          <g filter="url(#brainDropShadow)">
+
+            <!-- ==================== 1. SPINAL CORD / BRAINSTEM ==================== -->
+            <g class="brain-region" data-part="spinal" tabindex="0" role="button" aria-label="Spinal cord">
+              <path class="lobe-outline" fill="url(#spinalGrad)" stroke="#3d1936" stroke-width="2" stroke-linejoin="round"
+                d="M359 346 C377 351 395 350 407 344 C401 364 401 384 411 401 C422 414 435 422 445 438 L421 444 C411 427 397 413 383 398 C370 383 360 366 359 346 Z"/>
+              <g clip-path="url(#clipSpinal)" pointer-events="none">
+                <!-- Deep striated nerve fibers & vertical ridges -->
+                <path d="M369 349 C375 375 394 405 425 443" fill="none" stroke="#421a3b" stroke-width="2.4"/>
+                <path d="M378 350 C385 376 403 406 431 441" fill="none" stroke="#421a3b" stroke-width="2.2"/>
+                <path d="M388 349 C394 375 412 405 437 440" fill="none" stroke="#421a3b" stroke-width="2.2"/>
+                <path d="M397 347 C402 373 419 403 442 438" fill="none" stroke="#421a3b" stroke-width="2"/>
+                <!-- Glossy specular ridge highlights -->
+                <path d="M373 351 C380 376 398 405 427 441" fill="none" stroke="#f0c7e6" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
+                <path d="M383 351 C390 376 407 405 433 440" fill="none" stroke="#f0c7e6" stroke-width="1.6" stroke-linecap="round" opacity="0.75"/>
+                <!-- Shadow under temporal lobe -->
+                <path d="M356 347 C376 355 396 354 410 347" fill="none" stroke="#2d1028" stroke-width="6" opacity="0.65"/>
+              </g>
+            </g>
+
+            <!-- ==================== 2. CEREBELLUM ==================== -->
+            <g class="brain-region" data-part="cerebellum" tabindex="0" role="button" aria-label="Cerebellum">
+              <path class="lobe-outline" fill="url(#cerebellumGrad)" stroke="#4f2706" stroke-width="2.2" stroke-linejoin="round"
+                d="M412 342 C433 324 467 317 498 323 C528 328 552 345 552 369 C552 395 524 419 485 424 C448 429 415 415 404 391 C397 374 400 354 412 342 Z"/>
+              <g clip-path="url(#clipCerebellum)" pointer-events="none">
+                <!-- Deep folia grooves (dark brown curved striations) -->
+                <g fill="none" stroke="#592c08" stroke-width="2.2" stroke-linecap="round" opacity="0.85">
+                  <path d="M406 346 C446 327 502 326 546 347"/>
+                  <path d="M401 355 C445 335 505 335 552 357"/>
+                  <path d="M399 364 C445 344 507 345 554 367"/>
+                  <path d="M399 374 C446 354 507 355 553 377"/>
+                  <path d="M401 384 C447 365 505 366 549 387"/>
+                  <path d="M406 394 C449 376 502 377 542 397"/>
+                  <path d="M414 404 C453 388 498 389 532 406"/>
+                  <path d="M426 413 C459 400 493 401 519 415"/>
+                </g>
+                <!-- Bright cream/ochre folia ridge highlights -->
+                <g fill="none" stroke="#ffe5b4" stroke-width="1.9" stroke-linecap="round" opacity="0.85">
+                  <path d="M409 343 C447 324 501 323 543 344"/>
+                  <path d="M404 352 C446 332 504 332 549 354"/>
+                  <path d="M402 361 C446 341 506 342 551 364"/>
+                  <path d="M402 371 C447 351 506 352 550 374"/>
+                  <path d="M404 381 C448 362 504 363 546 384"/>
+                  <path d="M409 391 C450 373 501 374 539 394"/>
+                  <path d="M417 401 C454 385 497 386 529 403"/>
+                </g>
+                <!-- Top shadow cast by occipital & temporal lobes -->
+                <path d="M405 339 C445 322 505 321 548 340" fill="none" stroke="#361802" stroke-width="7" opacity="0.5"/>
+              </g>
+            </g>
+
+            <!-- ==================== 3. OCCIPITAL LOBE ==================== -->
+            <g class="brain-region" data-part="occipital" tabindex="0" role="button" aria-label="Occipital lobe">
+              <path class="lobe-outline" fill="url(#occipitalGrad)" stroke="#1d4666" stroke-width="2.2" stroke-linejoin="round"
+                d="M571 176 C590 185 601 208 594 229 C606 247 604 274 587 289 C588 308 571 324 551 322 C535 327 517 319 509 305 C503 288 506 269 499 253 C491 242 490 232 492 224 C498 212 512 204 526 206 C535 190 552 179 571 176 Z"/>
+              <g clip-path="url(#clipOccipital)" pointer-events="none">
+                <!-- Deep navy/slate sulci crevices -->
+                <g fill="none" stroke="#183b57" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M532 203 C545 215 542 234 527 244 C514 252 516 268 531 273"/>
+                  <path d="M565 184 C558 202 567 219 586 225"/>
+                  <path d="M551 228 C568 232 576 248 566 263 C556 277 567 294 584 292"/>
+                  <path d="M514 278 C531 281 544 295 541 314"/>
+                  <path d="M552 296 C558 306 555 316 547 322"/>
+                </g>
+                <!-- Soft secondary sulci shadows -->
+                <g fill="none" stroke="#2d6691" stroke-width="7" stroke-linecap="round" opacity="0.45">
+                  <path d="M532 205 C545 217 542 236 527 246"/>
+                  <path d="M551 230 C568 234 576 250 566 265"/>
+                </g>
+                <!-- Glossy ice-white highlights on gyri -->
+                <g fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" opacity="0.88">
+                  <path d="M549 191 C561 187 574 192 579 203"/>
+                  <path d="M518 221 C526 214 535 218 534 228"/>
+                  <path d="M573 237 C584 239 591 251 587 263"/>
+                  <path d="M534 257 C546 252 557 259 554 271"/>
+                  <path d="M517 292 C525 289 533 296 531 305"/>
+                  <path d="M563 301 C572 301 577 308 572 315"/>
+                </g>
+              </g>
+            </g>
+
+            <!-- ==================== 4. PARIETAL LOBE ==================== -->
+            <g class="brain-region" data-part="parietal" tabindex="0" role="button" aria-label="Parietal lobe">
+              <path class="lobe-outline" fill="url(#parietalGrad)" stroke="#7a4c00" stroke-width="2.2" stroke-linejoin="round"
+                d="M419 52 C444 48 471 57 487 74 C514 75 538 93 546 117 C567 128 578 153 571 176 C552 179 535 190 526 206 C512 204 498 212 492 224 C472 225 455 215 446 199 C431 190 411 193 398 205 C382 213 363 219 347 224 C361 206 360 183 372 162 C384 142 382 119 393 97 C401 81 416 69 419 52 Z"/>
+              <g clip-path="url(#clipParietal)" pointer-events="none">
+                <!-- Deep amber/brown sulci crevices -->
+                <g fill="none" stroke="#7d4a00" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+                  <!-- Postcentral sulcus running parallel to central sulcus -->
+                  <path d="M443 56 C436 82 419 101 415 128 C411 154 394 174 388 202"/>
+                  <!-- Intraparietal & upper folds -->
+                  <path d="M484 74 C474 96 485 118 507 123 C526 127 535 145 524 162"/>
+                  <path d="M436 122 C456 121 471 136 465 156 C459 175 474 191 494 187"/>
+                  <path d="M542 121 C534 138 543 156 561 161"/>
+                  <path d="M414 168 C432 166 446 179 445 196"/>
+                  <path d="M498 158 C514 164 522 182 514 199"/>
+                </g>
+                <!-- Warm golden shading beside sulci -->
+                <g fill="none" stroke="#c97d00" stroke-width="8" stroke-linecap="round" opacity="0.38">
+                  <path d="M445 58 C438 84 421 103 417 130 C413 156 396 176 390 204"/>
+                  <path d="M486 76 C476 98 487 120 509 125"/>
+                  <path d="M438 124 C458 123 473 138 467 158"/>
+                </g>
+                <!-- Creamy white specular highlights along puffy yellow gyri -->
+                <g fill="none" stroke="#fffff2" stroke-width="4.6" stroke-linecap="round" opacity="0.92">
+                  <!-- Postcentral gyrus ridge highlight -->
+                  <path d="M423 64 C415 84 402 99 398 121"/>
+                  <path d="M393 138 C389 159 376 177 371 198"/>
+                  <!-- Superior & inferior parietal gyri highlights -->
+                  <path d="M454 63 C467 62 477 71 474 84"/>
+                  <path d="M498 87 C515 88 529 100 532 115"/>
+                  <path d="M443 102 C457 98 470 106 471 119"/>
+                  <path d="M433 141 C447 137 458 146 454 159"/>
+                  <path d="M487 136 C503 135 516 144 514 157"/>
+                  <path d="M548 135 C559 141 563 154 557 166"/>
+                  <path d="M469 196 C482 199 493 206 493 215"/>
+                </g>
+              </g>
+            </g>
+
+            <!-- ==================== 5. TEMPORAL LOBE ==================== -->
+            <g class="brain-region" data-part="temporal" tabindex="0" role="button" aria-label="Temporal lobe">
+              <path class="lobe-outline" fill="url(#temporalGrad)" stroke="#4a1647" stroke-width="2.2" stroke-linejoin="round"
+                d="M276 312 C281 286 306 268 332 269 C349 247 375 231 401 221 C416 202 440 198 459 211 C475 215 488 221 495 234 C505 251 504 274 509 294 C512 311 499 327 482 329 C463 343 437 346 416 336 C395 352 365 356 341 344 C317 355 288 345 278 322 C276 319 275 315 276 312 Z"/>
+              <g clip-path="url(#clipTemporal)" pointer-events="none">
+                <!-- Deep plum sulci crevices (superior & inferior temporal sulci) -->
+                <g fill="none" stroke="#471344" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M312 299 C339 288 364 268 394 259 C422 251 446 234 475 238"/>
+                  <path d="M342 332 C368 320 397 307 428 303 C454 299 477 284 498 289"/>
+                  <path d="M372 242 C384 252 381 269 367 277"/>
+                  <path d="M432 214 C436 229 426 244 411 248"/>
+                  <path d="M454 262 C464 274 459 291 444 298"/>
+                  <path d="M398 313 C408 321 407 334 397 342"/>
+                </g>
+                <!-- Mid-tone plum sulcus shading -->
+                <g fill="none" stroke="#752970" stroke-width="8" stroke-linecap="round" opacity="0.42">
+                  <path d="M312 301 C339 290 364 270 394 261 C422 253 446 236 475 240"/>
+                  <path d="M342 334 C368 322 397 309 428 305"/>
+                </g>
+                <!-- Lavender-white specular highlights on temporal gyri -->
+                <g fill="none" stroke="#fbe8fa" stroke-width="4.2" stroke-linecap="round" opacity="0.9">
+                  <path d="M293 301 C303 287 320 280 335 282"/>
+                  <path d="M352 263 C367 251 384 243 401 241"/>
+                  <path d="M412 222 C425 213 442 212 454 220"/>
+                  <path d="M326 316 C348 305 372 293 396 289"/>
+                  <path d="M418 279 C435 271 454 268 471 273"/>
+                  <path d="M362 338 C377 333 392 332 405 336"/>
+                  <path d="M436 322 C455 319 473 314 488 306"/>
+                </g>
+              </g>
+            </g>
+
+            <!-- ==================== 6. FRONTAL LOBE ==================== -->
+            <g class="brain-region" data-part="frontal" tabindex="0" role="button" aria-label="Frontal lobe">
+              <path class="lobe-outline" fill="url(#frontalGrad)" stroke="#5c060b" stroke-width="2.2" stroke-linejoin="round"
+                d="M166 266 C152 246 151 224 162 206 C149 188 153 163 169 149 C166 125 182 99 207 90 C219 67 247 54 274 58 C293 43 324 41 346 53 C368 41 399 42 419 52 C416 69 401 81 393 97 C382 119 384 142 372 162 C360 183 361 206 347 224 C324 233 295 244 268 258 C240 272 213 287 188 282 C176 280 170 274 166 266 Z"/>
+              <g clip-path="url(#clipFrontal)" pointer-events="none">
+                <!-- Distinct Precentral Gyrus strip along the Central Sulcus (matches reference) -->
+                <path fill="url(#frontalPrecentral)" d="M388 46 L419 52 C416 69 401 81 393 97 C382 119 384 142 372 162 C360 183 361 206 347 224 L322 232 C336 208 334 182 348 157 C361 134 358 108 371 84 C378 70 385 58 388 46 Z"/>
+
+                <!-- Deep dark maroon sulci network creating dense, intricate cortical folds -->
+                <g fill="none" stroke="#590409" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round">
+                  <!-- Precentral sulcus -->
+                  <path d="M385 50 C376 74 358 95 356 122 C354 149 337 171 334 198 C332 211 326 222 319 231"/>
+                  <!-- Superior frontal sulci & gyri convolutions -->
+                  <path d="M342 54 C328 73 335 96 318 112 C302 127 311 149 294 162"/>
+                  <path d="M276 60 C268 81 283 101 268 119 C254 135 264 156 247 169"/>
+                  <path d="M214 91 C218 112 203 130 215 148 C227 165 210 185 191 182"/>
+                  <!-- Middle & inferior frontal folds -->
+                  <path d="M172 149 C189 152 198 168 186 184 C174 199 187 217 206 213"/>
+                  <path d="M236 126 C251 124 261 139 250 153 C239 167 251 185 269 182"/>
+                  <path d="M294 87 C308 87 317 102 305 115"/>
+                  <path d="M286 144 C304 143 317 159 308 176 C299 192 312 209 329 206"/>
+                  <!-- Orbital & lower frontal folds -->
+                  <path d="M164 211 C182 214 192 231 181 246 C172 258 182 271 198 271"/>
+                  <path d="M214 202 C233 197 250 211 243 229 C236 245 251 258 269 252"/>
+                  <path d="M266 196 C284 194 297 209 289 226 C283 238 291 247 302 246"/>
+                  <path d="M204 246 C221 244 233 257 227 272"/>
+                </g>
+
+                <!-- Soft crimson shadow halo around sulci for 3D roundness -->
+                <g fill="none" stroke="#8a0810" stroke-width="8" stroke-linecap="round" opacity="0.38">
+                  <path d="M385 52 C376 76 358 97 356 124 C354 151 337 173 334 200"/>
+                  <path d="M342 56 C328 75 335 98 318 114"/>
+                  <path d="M276 62 C268 83 283 103 268 121"/>
+                  <path d="M214 204 C233 199 250 213 243 231"/>
+                </g>
+
+                <!-- Glossy white/pink specular highlights on the rounded red gyri -->
+                <g fill="none" stroke="#ffd6d6" stroke-width="4.2" stroke-linecap="round" opacity="0.92">
+                  <!-- Precentral gyrus specular ridge -->
+                  <path d="M398 58 C392 75 381 88 377 107"/>
+                  <path d="M372 126 C369 144 358 160 354 179"/>
+                  <path d="M349 194 C346 205 340 214 334 221"/>
+                  <!-- Cortical gyri highlights -->
+                  <path d="M294 65 C308 61 322 67 325 79"/>
+                  <path d="M235 76 C248 70 262 75 264 87"/>
+                  <path d="M191 108 C201 99 213 103 213 115"/>
+                  <path d="M326 119 C338 115 348 123 345 135"/>
+                  <path d="M274 127 C286 123 296 131 293 142"/>
+                  <path d="M222 153 C234 148 244 156 241 167"/>
+                  <path d="M167 167 C176 161 185 167 182 177"/>
+                  <path d="M312 166 C324 163 333 172 329 184"/>
+                  <path d="M258 183 C271 178 282 185 280 196"/>
+                  <path d="M199 192 C211 187 222 193 221 203"/>
+                  <path d="M163 226 C172 222 179 229 175 238"/>
+                  <path d="M216 221 C228 216 238 224 234 235"/>
+                  <path d="M266 218 C277 215 285 223 280 233"/>
+                  <path d="M192 263 C204 261 215 264 221 271"/>
+                </g>
+              </g>
+            </g>
+
+            <!-- Central Sulcus deep crease separating Frontal and Parietal lobes -->
+            <path d="M419 52 C416 69 401 81 393 97 C382 119 384 142 372 162 C360 183 361 206 347 224"
+              fill="none" stroke="#2e0808" stroke-width="3.2" stroke-linecap="round" pointer-events="none"/>
+
+            <!-- Lateral Sulcus (Sylvian Fissure) deep shadow above Temporal lobe -->
+            <path d="M276 312 C281 286 306 268 332 269 C349 247 375 231 401 221 C416 202 440 198 459 211"
+              fill="none" stroke="#2b0926" stroke-width="3.4" stroke-linecap="round" pointer-events="none"/>
+          </g>
+
+          <!-- ==================== LEADER LINES & LABELS (Exact Reference Layout) ==================== -->
+          <g id="labelsGroup">
+            <!-- Frontal Lobe (Top Left) -->
+            <line class="leader-line" x1="168" y1="115" x2="255" y2="115"/>
+            <text class="leader-label" data-label="frontal" x="158" y="120" text-anchor="end">frontal lobe</text>
+
+            <!-- Temporal Lobe (Bottom Left) -->
+            <line class="leader-line" x1="215" y1="322" x2="322" y2="322"/>
+            <text class="leader-label" data-label="temporal" x="205" y="327" text-anchor="end">temporal lobe</text>
+
+            <!-- Spinal Cord (Bottom Center-Left) -->
+            <line class="leader-line" x1="358" y1="432" x2="424" y2="432"/>
+            <text class="leader-label" data-label="spinal" x="348" y="437" text-anchor="end">spinal cord</text>
+
+            <!-- Parietal Lobe (Top Right) -->
+            <line class="leader-line" x1="495" y1="104" x2="588" y2="104"/>
+            <text class="leader-label" data-label="parietal" x="598" y="109" text-anchor="start">parietal lobe</text>
+
+            <!-- Occipital Lobe (Middle Right) -->
+            <line class="leader-line" x1="572" y1="242" x2="635" y2="242"/>
+            <text class="leader-label" data-label="occipital" x="645" y="247" text-anchor="start">occipital lobe</text>
+
+            <!-- Cerebellum (Bottom Right) -->
+            <line class="leader-line" x1="518" y1="382" x2="606" y2="382"/>
+            <text class="leader-label" data-label="cerebellum" x="616" y="387" text-anchor="start">cerebellum</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Quick-select interactive buttons -->
+      <div class="buttons" role="group" aria-label="Brain regions quick select">
+        <button type="button" class="part-btn" data-button="frontal">
+          <span class="swatch" style="background:#e32227;"></span>Frontal lobe
+        </button>
+        <button type="button" class="part-btn" data-button="parietal">
+          <span class="swatch" style="background:#ffd829;"></span>Parietal lobe
+        </button>
+        <button type="button" class="part-btn" data-button="temporal">
+          <span class="swatch" style="background:#be62b6;"></span>Temporal lobe
+        </button>
+        <button type="button" class="part-btn" data-button="occipital">
+          <span class="swatch" style="background:#84c9eb;"></span>Occipital lobe
+        </button>
+        <button type="button" class="part-btn" data-button="cerebellum">
+          <span class="swatch" style="background:#c47f33;"></span>Cerebellum
+        </button>
+        <button type="button" class="part-btn" data-button="spinal">
+          <span class="swatch" style="background:#9d5d90;"></span>Spinal cord
+        </button>
+      </div>
+    </section>
+
+    <!-- Region Information & Function Card -->
+    <aside class="panel details" aria-live="polite">
+      <div class="eyebrow">Selected brain region</div>
+
+      <h2 id="partName">Choose a part</h2>
+      <p id="intro">Tap any colored region on the brain diagram to inspect its anatomical location, definition, and primary functions.</p>
+
+      <h3 id="definitionHeading" hidden>Definition</h3>
+      <p id="definition" hidden></p>
+
+      <h3 id="functionHeading" hidden>Main function</h3>
+      <p id="function" hidden></p>
+
+      <div class="note">
+        <strong>Note:</strong> Although each lobe specializes in distinct sensory, motor, or cognitive tasks, the regions of the brain communicate continuously as one integrated network.
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const parts = {
+      frontal: {
+        name: "Frontal Lobe",
+        definition: "The frontal lobe is the largest and most anterior section of the cerebral cortex, located directly behind the forehead and separated from the parietal lobe by the central sulcus.",
+        function: "It governs executive functions including planning, reasoning, decision-making, problem-solving, impulse control, voluntary motor movement (via the primary motor cortex), and speech production."
+      },
+      parietal: {
+        name: "Parietal Lobe",
+        definition: "The parietal lobe sits in the upper middle region of the cerebral hemisphere, positioned behind the frontal lobe and above the occipital and temporal lobes.",
+        function: "It integrates somatosensory information such as touch, pressure, temperature, and pain, while supporting spatial awareness, navigation, and hand-eye coordination."
+      },
+      temporal: {
+        name: "Temporal Lobe",
+        definition: "The temporal lobe is situated on the lower sides of the brain beneath the lateral sulcus (Sylvian fissure), roughly aligned with the temples and ears.",
+        function: "It processes auditory signals, enables language comprehension, recognizes faces and objects, and plays a vital role in forming and retrieving long-term memories."
+      },
+      occipital: {
+        name: "Occipital Lobe",
+        definition: "The occipital lobe is the rearmost region of the cerebrum, resting at the back of the skull just above the cerebellum.",
+        function: "As the primary visual processing center of the brain, it interprets light signals from the eyes to perceive shapes, colors, depth, distance, and motion."
+      },
+      cerebellum: {
+        name: "Cerebellum",
+        definition: "The cerebellum (meaning 'little brain') is the densely folded, striped structure tucked beneath the occipital and temporal lobes at the lower back of the skull.",
+        function: "It fine-tunes voluntary muscle activity to maintain posture, balance, equilibrium, and smooth, coordinated movements, as well as motor skill learning."
+      },
+      spinal: {
+        name: "Spinal Cord",
+        definition: "Extending downward from the brainstem at the base of the brain, the spinal cord is a cylindrical bundle of nerve fibers enclosed within the vertebral column.",
+        function: "It acts as the main communication highway transmitting motor commands from the brain to the body, relaying sensory signals back to the brain, and coordinating rapid spinal reflexes."
+      }
+    };
+
+    function selectBrainPart(key) {
+      const data = parts[key];
+      if (!data) return;
+
+      // Update details panel
+      document.getElementById("partName").textContent = data.name;
+      document.getElementById("intro").hidden = true;
+
+      ["definitionHeading", "definition", "functionHeading", "function"].forEach(id => {
+        document.getElementById(id).hidden = false;
+      });
+      document.getElementById("definition").textContent = data.definition;
+      document.getElementById("function").textContent = data.function;
+
+      // Update SVG regions visual state
+      document.querySelectorAll(".brain-region").forEach(region => {
+        const isSelected = region.dataset.part === key;
+        region.classList.toggle("active", isSelected);
+        region.classList.toggle("dimmed", !isSelected);
+      });
+
+      // Highlight matching SVG text label
+      document.querySelectorAll(".leader-label").forEach(lbl => {
+        lbl.classList.toggle("active", lbl.dataset.label === key);
+      });
+
+      // Highlight matching button
+      document.querySelectorAll("[data-button]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.button === key);
+      });
+    }
+
+    // Attach interactions to SVG brain regions
+    document.querySelectorAll(".brain-region").forEach(region => {
+      region.addEventListener("click", () => selectBrainPart(region.dataset.part));
+      region.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          selectBrainPart(region.dataset.part);
+        }
+      });
+    });
+
+    // Allow clicking text labels directly as well
+    document.querySelectorAll(".leader-label").forEach(label => {
+      label.addEventListener("click", () => selectBrainPart(label.dataset.label));
+    });
+
+    // Attach interactions to quick-select buttons
+    document.querySelectorAll("[data-button]").forEach(btn => {
+      btn.addEventListener("click", () => selectBrainPart(btn.dataset.button));
+    });
+  </script>
+</body>
+</html>
